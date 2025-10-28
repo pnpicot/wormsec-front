@@ -1,0 +1,98 @@
+.d-flex, .col, .row {
+    display: flex;
+    box-sizing: border-box;
+
+    &.inline {
+        display: inline-flex;
+    }
+}
+
+.expand {
+    flex: 1 1 auto;
+
+    &.strict {
+        flex: 1 1 0;
+    }
+}
+
+.wrap {
+    flex-wrap: wrap;
+}
+
+.expand-w {
+    width: 100%;
+}
+
+.expand-h {
+    height: 100%;
+}
+
+.col {
+    flex-direction: column;
+}
+
+.row {
+    flex-direction: row;
+}
+
+.justify-start {
+    justify-content: flex-start;
+}
+
+.justify-center {
+    justify-content: center;
+}
+
+.justify-end {
+    justify-content: flex-end;
+}
+
+.justify-space-between {
+    justify-content: space-between;
+}
+
+.justify-space-around {
+    justify-content: space-around;
+}
+
+.justify-space-evenly {
+    justify-content: space-evenly;
+}
+
+.align-start {
+    align-items: flex-start;
+}
+
+.align-center {
+    align-items: center;
+}
+
+.align-end {
+    align-items: flex-end;
+}
+
+@for $i from 1 through 10 {
+    .pad-#{$i} {
+        padding: $i * .25em;
+    }
+
+    .gap-#{$i} {
+        gap: $i * .25em;
+    }
+
+    .mt-#{$i} {
+        margin-top: $i * .25em;
+    }
+
+    .mb-#{$i} {
+        margin-bottom: $i * .25em;
+    }
+
+    .ml-#{$i} {
+        margin-left: $i * .25em;
+    }
+
+    .mr-#{$i} {
+        margin-right: $i * .25em;
+    }
+}

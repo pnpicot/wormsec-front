@@ -1,0 +1,23 @@
+@import '../../../styles.scss';
+
+:host {
+    display: block;
+    position: relative;
+    width: 100%;
+}
+
+.filter-category {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    gap: .5em;
+
+    li {
+        &:first-child {
+            font-weight: 600;
+        }
+    }
+}

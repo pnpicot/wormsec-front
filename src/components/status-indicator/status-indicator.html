@@ -1,0 +1,10 @@
+<div class="status-wrapper status-{{ status }}">
+    <div class="node"></div>
+    @if (status == 'online') {
+        <span>Online</span>
+    } @else if (status == 'compromised') {
+        <span>Compromised</span>
+    } @else if (status == 'isolated') {
+        <span>Isolated</span>
+    }
+</div>

@@ -1,0 +1,97 @@
+.text-1 {
+    font-size: .6rem;
+}
+
+.text-2 {
+    font-size: .75rem;
+}
+
+.text-3 {
+    font-size: .85rem;
+}
+
+.text-4 {
+    font-size: .9rem;
+}
+
+.text-5 {
+    font-size: 1rem;
+}
+
+.text-6 {
+    font-size: 1.1rem;
+}
+
+.text-7 {
+    font-size: 1.15rem;
+}
+
+.text-8 {
+    font-size: 1.2rem;
+}
+
+.text-9 {
+    font-size: 1.25rem;
+}
+
+.text-10 {
+    font-size: 1.35rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+}
+
+@for $i from 1 through 10 {
+    .w#{$i * 100} {
+        font-weight: $i * 100;
+    }
+}
+
+.dim-1 {
+    opacity: .8;
+}
+
+.dim-2 {
+    opacity: .6;
+}
+
+.dim-3 {
+    opacity: .4;
+}
+
+.dim-4 {
+    opacity: .2;
+}
+
+.dim-5 {
+    opacity: .1;
+}
+
+.color-primary {
+    color: $primary;
+}
+
+.color-secondary {
+    color: $secondary;
+}
+
+.color-accent {
+    color: $accent;
+}
+
+.color-success {
+    color: $success;
+}
+
+.color-warning {
+    color: $warning;
+}
+
+.color-error {
+    color: $error;
+}
+
+.upper {
+    text-transform: uppercase;
+}

@@ -1,0 +1,12 @@
+<div
+    class="checkbox-wrapper"
+    [class.checked]="checked"
+    (click)="this.onClick()"
+>
+    <div class="node">
+        <i class="fas fa-check text-1"></i>
+    </div>
+    <span class="text-5">
+        <ng-content></ng-content>
+    </span>
+</div>

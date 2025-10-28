@@ -1,0 +1,36 @@
+.btn {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+    gap: .5em;
+    border: none;
+    outline: none;
+    padding: .5em;
+    border-radius: 3pt;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+
+    &.auto {
+        flex: 1 1 auto;
+    }
+
+    &.btn-primary {
+        background-color: rgba($accent, .05);
+        color: $accent;
+        border: 1px solid rgba($accent, .1);
+
+        &:hover {
+            background-color: rgba($accent, .15);
+        }
+
+        &:active {
+            background-color: rgba($accent, .25);
+        }
+    }
+
+    &:focus {
+        outline: none;
+    }
+}

@@ -1,0 +1,30 @@
+@import '../../../styles.scss';
+
+:host {
+    display: block;
+    position: relative;
+    width: 100%;
+}
+
+.event-list {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    gap: 1em;
+
+    li {
+        display: flex;
+        position: relative;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 1em;
+
+        &:not(:last-child) {
+            border-bottom: 1px solid rgba($accent, .1);
+            padding-bottom: 1em;
+        }
+    }
+}

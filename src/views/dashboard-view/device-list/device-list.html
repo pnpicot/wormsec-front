@@ -1,0 +1,41 @@
+<div class="col pad-4 gap-5">
+    <span class="text-10 ml-2">Devices</span>
+    <table class="device-table">
+        <thead>
+            <tr>
+                <th>
+                    Name
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Risk
+                </th>
+                <th>
+                    OS
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (device of devices; track device) {
+                <tr>
+                    <td>
+                        {{ device.name }}
+                    </td>
+                    <td>
+                        <app-status-indicator [status]="device.status" />
+                    </td>
+                    <td>
+                        <div class="risk-indicator {{ device.risk }}">
+                            {{ device.risk }}
+                        </div>
+                    </td>
+                    <td>
+                        <i class="fab fa-{{ device.os }} dim-1"></i>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,56 @@
+@import '../../styles.scss';
+
+.checkbox-wrapper {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+    gap: .5em;
+    user-select: none;
+    cursor: pointer;
+
+    span {
+        opacity: .6;
+    }
+
+    &:hover {
+        span {
+            opacity: 1;
+        }
+    }
+
+    &.checked {
+        .node {
+            .fas, .far {
+                opacity: 1;
+            }
+        }
+    }
+
+    &:hover:not(.checked) {
+        .node {
+            .fas, .far {
+                opacity: .3;
+            }
+        }
+    }
+
+    .node {
+        display: block;
+        position: relative;
+        width: 1.1em;
+        height: 1.1em;
+        background-color: rgba($accent, .1);
+        border: 1px solid rgba($accent, .3);
+        border-radius: 2pt;
+        pointer-events: none;
+
+        .fas, .far {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+        }
+    }
+}
