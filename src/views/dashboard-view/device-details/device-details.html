@@ -1,43 +1,87 @@
-<div class="col pad-4 gap-5">
-    <span class="text-10">Device Details</span>
-    <div class="col gap-2 pad-4 panel expand-w">
-        <div class="row gap-2 align-center">
-            <i class="fas fa-laptop text-4 dim-3"></i>
-            <span class="text-5">Desktop-1</span>
-            <span class="text-4 dim-2">(10.0.0.28)</span>
+<div class="device-details-container">
+  @if (selectedDevice) {
+    <div class="details-content">
+      <div class="details-header">
+        <span class="text-10">Device Details</span>
+      </div>
+
+      <div class="device-info-card">
+        <div class="device-header">
+          <i class="fas {{ getOSIcon(selectedDevice.os) }} device-icon"></i>
+          <div class="device-identity">
+            <span class="device-name">{{ selectedDevice.name }}</span>
+            @if (selectedDevice.ip) {
+              <span class="device-ip">({{ selectedDevice.ip }})</span>
+            }
+          </div>
         </div>
-        <app-status-indicator status="online" />
-        <div class="row gap-2 wrap mt-2">
-            <button class="btn btn-primary text-4 auto">Isolate</button>
-            <button class="btn btn-primary text-4 auto">Restore</button>
-            <button class="btn btn-primary text-4 auto">Force scan</button>
-            <button class="btn btn-primary text-4 auto">Update plugins</button>
+        
+        <app-status-indicator [status]="selectedDevice.status" />
+
+        <div class="action-buttons">
+          <button class="btn btn-primary" (click)="onIsolate()">
+            <i class="fas fa-shield-halved"></i>
+            Isolate
+          </button>
+          <button class="btn btn-primary" (click)="onRestore()">
+            <i class="fas fa-rotate-left"></i>
+            Restore
+          </button>
+          <button class="btn btn-primary" (click)="onForceScan()">
+            <i class="fas fa-magnifying-glass"></i>
+            Force scan
+          </button>
+          <button class="btn btn-primary" (click)="onUpdatePlugins()">
+            <i class="fas fa-plug"></i>
+            Update plugins
+          </button>
         </div>
+      </div>
+
+      <!-- NOUVELLE SECTION : Links -->
+      @if (getConnectedDevices().length > 0) {
+        <div class="links-section">
+          <span class="section-title">Links</span>
+          <div class="links-card">
+            <ul class="link-list">
+              @for (device of getConnectedDevices(); track device.id) {
+                <li class="link-item" (click)="onLinkClick(device)">
+                  <i class="fas fa-network-wired link-icon"></i>
+                  <div class="link-content">
+                    <span class="link-name">{{ device.name }}</span>
+                    <span class="link-ip">{{ device.ip }}</span>
+                  </div>
+                  <app-status-indicator [status]="device.status" />
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+
+      @if (selectedDevice.events && selectedDevice.events.length > 0) {
+        <div class="events-section">
+          <span class="section-title">Events</span>
+          <div class="events-card">
+            <ul class="event-list">
+              @for (event of selectedDevice.events; track event.id) {
+                <li class="event-item">
+                  <i class="fas {{ event.icon }} event-icon color-{{ event.iconColor }}"></i>
+                  <div class="event-content">
+                    <span class="event-title">{{ event.title }}</span>
+                    <span class="event-timestamp">{{ event.timestamp }}</span>
+                  </div>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
     </div>
-    <span class="text-6 dim-1">Events</span>
-    <div class="col gap-2 pad-4 panel expand-w">
-        <ul class="event-list">
-            <li>
-                <i class="fas fa-plug-circle-check color-success"></i>
-                <div class="col gap-1">
-                    <span class="text-5">Plugin updated</span>
-                    <span class="text-4 dim-2">Today, 10:55</span>
-                </div>
-            </li>
-            <li>
-                <i class="fas fa-plug-circle-exclamation color-warning"></i>
-                <div class="col gap-1">
-                    <span class="text-5">Outdated plugin detected</span>
-                    <span class="text-4 dim-2">Today, 10:48AM</span>
-                </div>
-            </li>
-            <li>
-                <i class="fas fa-link color-success"></i>
-                <div class="col gap-1">
-                    <span class="text-5">Device linked</span>
-                    <span class="text-4 dim-2">Today, 8:21AM</span>
-                </div>
-            </li>
-        </ul>
+  } @else {
+    <div class="no-selection">
+      <i class="fas fa-laptop-code empty-icon"></i>
+      <p class="empty-text">Select a device to view details</p>
     </div>
+  }
 </div>

@@ -1,8 +1,5 @@
-@import '../styles.scss';
-
 :host {
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    height: 100vh;
+  display: block;
+  width: 100%;
+  height: 100%;
 }

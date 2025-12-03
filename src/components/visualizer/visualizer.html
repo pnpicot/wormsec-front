@@ -1,0 +1,45 @@
+<div class="visualizer-container">
+  <svg class="visualizer-svg" [attr.viewBox]="viewBox()" preserveAspectRatio="xMidYMid meet">
+    <!-- Edges -->
+    <g class="edges">
+      @for (edge of edges; track edge.from + edge.to) {
+        <line
+          [attr.x1]="getNodePosition(edge.from).x"
+          [attr.y1]="getNodePosition(edge.from).y"
+          [attr.x2]="getNodePosition(edge.to).x"
+          [attr.y2]="getNodePosition(edge.to).y"
+          class="edge"
+        />
+      }
+    </g>
+
+    <!-- Nodes -->
+    <g class="nodes">
+      @for (node of nodes; track node.id) {
+        <g 
+          [attr.class]="getNodeClass(node.device)"
+          [attr.transform]="'translate(' + node.x + ',' + node.y + ')'"
+          (click)="onNodeClick(node.id)"
+        >
+          <circle r="30" class="node-circle" />
+          <text class="node-label" text-anchor="middle" dy=".3em">
+            {{ node.id }}
+          </text>
+        </g>
+      }
+    </g>
+  </svg>
+
+  <!-- Boutons de contrôle du zoom -->
+  <div class="zoom-controls">
+    <button class="zoom-btn" (click)="zoomIn()" title="Zoom In">
+      <i class="fas fa-plus"></i>
+    </button>
+    <button class="zoom-btn" (click)="resetZoom()" title="Reset Zoom">
+      <i class="fas fa-maximize"></i>
+    </button>
+    <button class="zoom-btn" (click)="zoomOut()" title="Zoom Out">
+      <i class="fas fa-minus"></i>
+    </button>
+  </div>
+</div>

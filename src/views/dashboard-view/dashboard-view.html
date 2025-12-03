@@ -1,11 +1,35 @@
-<ul class="dashboard-panels">
-    <li>
-        <app-filters />
-    </li>
-    <li>
-        <app-device-list />
-    </li>
-    <li>
-        <app-device-details />
-    </li>
-</ul>
+<div class="dashboard-container">
+  <app-header 
+    (chatbotToggle)="onChatbotToggle()"
+    (settingsClick)="onSettingsClick()"
+  />
+
+  <div class="dashboard-workspace">
+    @for (window of windows(); track window.id) {
+      <app-window
+        [window]="window"
+        (close)="onWindowClose($any(window.id))"
+        (minimize)="onWindowMinimize($any(window.id))"
+        (maximize)="onWindowMaximize($any(window.id))"
+        (focus)="onWindowFocus($any(window.id))"
+        (positionChange)="onWindowPositionChange($any(window.id), $event)"
+        (sizeChange)="onWindowSizeChange($any(window.id), $event)"
+      >
+        @switch (window.component) {
+          @case ('device-list') {
+            <app-device-list />
+          }
+          @case ('device-details') {
+            <app-device-details />
+          }
+          @case ('visualizer') {
+            <app-visualizer />
+          }
+          @case ('chatbot') {
+            <app-chatbot />
+          }
+        }
+      </app-window>
+    }
+  </div>
+</div>

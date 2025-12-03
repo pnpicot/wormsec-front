@@ -1,5 +1,7 @@
+@use '../theme' as *;
+
 .panel {
     background-color: rgba($accent, .05);
-    border: 1px solid rgba($accent, .1);
-    border-radius: 5pt;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-2);
 }

@@ -1,30 +1,17 @@
-@import '../../styles.scss';
+@use '../../styles/theme';
 
-:host {
-    display: flex;
-    position: relative;
-    flex: 1 1 auto;
+.dashboard-container {
+  width: 100vw;
+  height: 100vh;
+  background: #1a1d2e;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.dashboard-panels {
-    display: flex;
-    position: relative;
-    flex-direction: row;
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-    flex: 1 1 auto;
-    flex-wrap: wrap;
-    margin-top: -2px;
-
-    li {
-        display: flex;
-        position: relative;
-        flex: 1 1 auto;
-        border-top: 2px solid rgba($accent, .05);
-
-        &:not(:last-child) {
-            border-right: 1px solid rgba($accent, .1);
-        }
-    }
+.dashboard-workspace {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  overflow: hidden;
 }

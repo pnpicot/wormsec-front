@@ -1,4 +1,4 @@
-@import '../../styles.scss';
+@use '../../styles' as *;
 
 .search-wrapper {
     border-radius: 5pt;
@@ -28,4 +28,9 @@
             outline: none;
         }
     }
+}
+
+.search-bar {
+    background-color: rgba($secondary, .3);
+    // ... reste du fichier
 }

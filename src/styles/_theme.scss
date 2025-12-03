@@ -1,22 +1,59 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+:root {
+  // Colors
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --accent: #8b5cf6;
+  --success: #22c55e;
+  --warning: #fbbf24;
+  --error: #ef4444;
+  --info: #3b82f6;
 
+  // Backgrounds - ÉCLAIRCIR LE FOND
+  --background: #1a1d2e;  // Fond principal éclairci
+  --surface-1: #0f1218;   // Fenêtres plus sombres que le fond
+  --surface-2: #1a1f2e;
+  --surface-3: #252a3a;
+  --surface-4: #2d3348;
 
-// Colors
+  // Borders
+  --border-color: rgba(255, 255, 255, 0.1);
 
-$primary: #101118;
-$secondary: #1E2743;
-$accent: #A4B1FC;
-$text: #E8E8FC;
-$online: #60f2c4;
-$compromised: #ed9494;
-$isolated: #ececa4;
-$risk-low: #82B49A;
-$risk-medium: #BABB92;
-$risk-high: #bb9892;
-$success: #60f29a;
-$warning: rgb(219, 209, 95);
-$error: rgb(229, 111, 111);
+  // Text
+  --text-1: #f8fafc;
+  --text-2: #cbd5e1;
+  --text-3: #94a3b8;
 
-// Fonts
+  // Font
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 
-$font: 'Inter', sans-serif;
+  // Spacing
+  --radius-1: 0.375rem;
+  --radius-2: 0.5rem;
+  --radius-3: 0.75rem;
+
+  // Typography sizes
+  --text-4: 0.75rem;
+  --text-5: 0.875rem;
+  --text-6: 1rem;
+  --text-8: 1.25rem;
+  --text-10: 1.5rem;
+
+  // RGB values for transparency usage
+  --primary-rgb: 99, 102, 241;
+  --success-rgb: 34, 197, 94;
+  --warning-rgb: 251, 191, 36;
+  --error-rgb: 239, 68, 68;
+  --info-rgb: 59, 130, 246;
+}
+
+// Sass variables (pour compatibilité avec ancien code utilisant $variables)
+$primary: #6366f1;
+$secondary: #cbd5e1;
+$accent: #8b5cf6;
+$success: #22c55e;
+$warning: #fbbf24;
+$error: #ef4444;
+$info: #3b82f6;
+$online: #22c55e;
+$compromised: #ef4444;  // ← AJOUTER CETTE LIGNE (même couleur que error)
+$text: #f8fafc;

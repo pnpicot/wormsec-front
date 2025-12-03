@@ -1,34 +1,84 @@
-body {
-    display: flex;
-    flex-direction: column;
-    position: relative;
+* {
     margin: 0;
     padding: 0;
-    min-height: 100vh;
-    background-color: $primary;
-    font-family: $font;
-    color: $text;
-    -webkit-font-smoothing: antialiased;
-    -mos-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
     box-sizing: border-box;
 }
 
-::-webkit-scrollbar {
-    width: 7px;
+html, body {
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
-::-webkit-scrollbar-track {
-    background: rgba($primary, 0.6);
-    border-radius: inherit;
+body {
+    font-family: var(--font-family);
+    background: var(--background);
+    color: var(--text-1);
+    line-height: 1.5;
 }
 
-::-webkit-scrollbar-thumb {
-    background: rgba($accent, 0.15);
-    border-radius: inherit;
-    cursor: pointer;
+// Utility classes
+.col {
+    display: flex;
+    flex-direction: column;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: rgba($accent, 0.3);
+.row {
+    display: flex;
+    flex-direction: row;
 }
+
+.expand {
+    flex: 1;
+}
+
+.expand-w {
+    width: 100%;
+}
+
+.expand-h {
+    height: 100%;
+}
+
+.gap-1 { gap: 0.25rem; }
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }
+.gap-5 { gap: 1.25rem; }
+
+.pad-1 { padding: 0.25rem; }
+.pad-2 { padding: 0.5rem; }
+.pad-3 { padding: 0.75rem; }
+.pad-4 { padding: 1rem; }
+.pad-5 { padding: 1.25rem; }
+
+.m-0 { margin: 0; }
+.mt-1 { margin-top: 0.25rem; }
+.mt-2 { margin-top: 0.5rem; }
+.mt-3 { margin-top: 0.75rem; }
+.mt-4 { margin-top: 1rem; }
+.ml-1 { margin-left: 0.25rem; }
+.ml-2 { margin-left: 0.5rem; }
+.ml-3 { margin-left: 0.75rem; }
+.ml-4 { margin-left: 1rem; }
+
+.align-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+
+.wrap { flex-wrap: wrap; }
+
+.auto { width: auto; }
+
+// Text utilities
+.dim-1 { opacity: 0.9; }
+.dim-2 { opacity: 0.7; }
+.dim-3 { opacity: 0.5; }
+
+// Color utilities
+.color-success { color: var(--success); }
+.color-warning { color: var(--warning); }
+.color-error { color: var(--error); }
+.color-info { color: var(--info); }

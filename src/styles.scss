@@ -1,5 +1,5 @@
-@import 'styles/theme';
-@import 'styles/global';
-@import 'styles/layout';
-@import 'styles/typography';
-@import 'styles/components/components';
+@forward 'styles/theme';
+@forward 'styles/global';
+@forward 'styles/layout';
+@forward 'styles/typography';
+@forward 'styles/components/components';

@@ -1,4 +1,4 @@
-@import '../../styles.scss';
+@use '../../styles' as *;
 
 .checkbox-wrapper {
     display: flex;
@@ -52,5 +52,13 @@
             transform: translate(-50%, -50%);
             opacity: 0;
         }
+    }
+}
+
+.checkbox {
+    // ... 
+    &:checked {
+        background-color: rgba($accent, .1);
+        // ...
     }
 }

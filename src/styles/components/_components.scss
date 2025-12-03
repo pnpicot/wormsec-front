@@ -1,2 +1,7 @@
-@import 'panel';
-@import 'button';
+// Forward theme first so components can use variables
+@use '../theme';
+
+// Forward all component styles
+@forward 'button';
+@forward 'panel';
+@forward 'window';

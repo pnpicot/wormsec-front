@@ -1,0 +1,42 @@
+<div 
+  #windowElement
+  class="window"
+  [class.minimized]="window.isMinimized"
+  [class.maximized]="window.isMaximized"
+  [style.left.px]="window.position.x"
+  [style.top.px]="window.position.y"
+  [style.width.px]="window.isMaximized ? null : window.size.width"
+  [style.height.px]="window.isMaximized ? null : window.size.height"
+  [style.z-index]="window.zIndex"
+  (mousedown)="onWindowClick()"
+  *ngIf="window.isOpen">
+  
+  <div class="window-header" (mousedown)="onHeaderMouseDown($event)">
+    <span class="window-title">{{ window.title }}</span>
+    <div class="window-controls">
+      <button class="window-control-btn" (click)="onMinimize()" title="Minimize">
+        <i class="fas fa-minus"></i>
+      </button>
+      <button class="window-control-btn" (click)="onMaximize()" title="Maximize">
+        <i class="fas" [class.fa-window-maximize]="!window.isMaximized" [class.fa-window-restore]="window.isMaximized"></i>
+      </button>
+      <button class="window-control-btn close" (click)="onClose()" title="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="window-content">
+    <ng-content></ng-content>
+  </div>
+
+  <!-- Resize handles -->
+  <div class="resize-handle n" (mousedown)="onResizeHandleMouseDown($event, 'n')" *ngIf="!window.isMaximized"></div>
+  <div class="resize-handle e" (mousedown)="onResizeHandleMouseDown($event, 'e')" *ngIf="!window.isMaximized"></div>
+  <div class="resize-handle s" (mousedown)="onResizeHandleMouseDown($event, 's')" *ngIf="!window.isMaximized"></div>
+  <div class="resize-handle w" (mousedown)="onResizeHandleMouseDown($event, 'w')" *ngIf="!window.isMaximized"></div>
+  <div class="resize-handle ne" (mousedown)="onResizeHandleMouseDown($event, 'ne')" *ngIf="!window.isMaximized"></div>
+  <div class="resize-handle nw" (mousedown)="onResizeHandleMouseDown($event, 'nw')" *ngIf="!window.isMaximized"></div>
+  <div class="resize-handle se" (mousedown)="onResizeHandleMouseDown($event, 'se')" *ngIf="!window.isMaximized"></div>
+  <div class="resize-handle sw" (mousedown)="onResizeHandleMouseDown($event, 'sw')" *ngIf="!window.isMaximized"></div>
+</div>
