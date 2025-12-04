@@ -7,7 +7,7 @@
 
       <div class="device-info-card">
         <div class="device-header">
-          <i class="fas {{ getOSIcon(selectedDevice.os) }} device-icon"></i>
+          <i class="{{ getOSIcon(selectedDevice.os) }} device-icon"></i>
           <div class="device-identity">
             <span class="device-name">{{ selectedDevice.name }}</span>
             @if (selectedDevice.ip) {

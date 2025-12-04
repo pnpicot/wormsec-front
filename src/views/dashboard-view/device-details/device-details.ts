@@ -22,10 +22,10 @@ export class DeviceDetails {
 
   getOSIcon(os: string): string {
     const icons: { [key: string]: string } = {
-      'windows': 'fa-windows',
-      'apple': 'fa-apple',
-      'linux': 'fa-linux',
-      'debian': 'fa-debian'
+      'windows': 'fab fa-windows',
+      'apple': 'fab fa-apple',
+      'linux': 'fab fa-linux',
+      'debian': 'fab fa-debian'
     };
     return icons[os] || 'fa-desktop';
   }
