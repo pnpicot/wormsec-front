@@ -37,6 +37,13 @@ export class VisualizerComponent implements OnInit {
   private minZoom = 0.5;
   private maxZoom = 3;
 
+  // ✅ Pan/Drag
+  private isPanning = false;
+  private panStartX = 0;
+  private panStartY = 0;
+  private viewBoxStartX = 0;
+  private viewBoxStartY = 0;
+
   constructor(
     private deviceService: DeviceService,
     private windowManager: WindowManagerService
@@ -45,17 +52,14 @@ export class VisualizerComponent implements OnInit {
       const selected = this.deviceService.selectedDevice();
       this.selectedDeviceId = selected?.id || null;
       
-      // Zoom sur la machine sélectionnée si elle existe
       if (selected && this.nodes.length > 0) {
         this.zoomToNode(selected.id);
       }
     });
 
-    // Observer la fermeture de la fenêtre details
     effect(() => {
       const detailsWindow = this.windowManager.getWindow('details');
       if (detailsWindow && !detailsWindow.isOpen && this.selectedDeviceId) {
-        // Réinitialiser la sélection et le zoom
         this.deviceService.selectDevice(null);
         this.resetZoom();
       }
@@ -64,18 +68,22 @@ export class VisualizerComponent implements OnInit {
 
   ngOnInit() {
     this.generateVisualization();
-    this.resetZoom(); // Vue globale par défaut
+    this.resetZoom();
     
-    // Ajouter le listener pour le zoom avec la molette
     if (isPlatformBrowser(this.platformId)) {
       setTimeout(() => {
         const svgElement = document.querySelector('.visualizer-svg');
         if (svgElement) {
           svgElement.addEventListener('wheel', this.onWheel.bind(this), { passive: false });
+          svgElement.addEventListener('mousedown', ((e: Event) => this.onMouseDown(e as MouseEvent)) as EventListener);
+          svgElement.addEventListener('mousemove', ((e: Event) => this.onMouseMove(e as MouseEvent)) as EventListener);
+          svgElement.addEventListener('mouseup', this.onMouseUp.bind(this) as EventListener);
+          svgElement.addEventListener('mouseleave', this.onMouseUp.bind(this) as EventListener);
         }
       }, 100);
     }
   }
+
 
   private generateVisualization() {
     const devices = this.deviceService.devices();
@@ -83,7 +91,6 @@ export class VisualizerComponent implements OnInit {
     const centerY = 175;
     const radius = 120;
 
-    // Afficher TOUTES les 6 machines en cercle
     this.nodes = devices.map((device, index) => {
       const angle = (index * 2 * Math.PI) / devices.length - Math.PI / 2;
       return {
@@ -94,7 +101,6 @@ export class VisualizerComponent implements OnInit {
       };
     });
 
-    // Créer les edges
     this.edges = [];
     devices.forEach(device => {
       if (device.connections) {
@@ -111,27 +117,67 @@ export class VisualizerComponent implements OnInit {
     });
   }
 
-  onNodeClick(nodeId: string) {
-    // Si c'est déjà la machine sélectionnée, ne rien faire
+  onNodeClick(nodeId: string, event: MouseEvent) {
+    event.stopPropagation(); // ✅ Empêche le pan quand on clique sur un node
+    
     if (this.selectedDeviceId === nodeId) {
       return;
     }
     
-    // Sélectionner le device
     this.deviceService.selectDevice(nodeId);
     
-    // Ouvrir la fenêtre details seulement si elle n'est pas déjà ouverte
     const detailsWindow = this.windowManager.getWindow('details');
     if (!detailsWindow?.isOpen) {
       this.windowManager.openWindow('details');
     }
   }
 
+  private onMouseDown(event: MouseEvent) {
+    const target = event.target as SVGElement;
+    if (target.closest('.node')) {
+      return;
+    }
+
+    this.isPanning = true;
+    this.panStartX = event.clientX;
+    this.panStartY = event.clientY;
+    
+    const viewBoxValues = this.viewBox().split(' ').map(Number);
+    this.viewBoxStartX = viewBoxValues[0];
+    this.viewBoxStartY = viewBoxValues[1];
+  }
+
+  private onMouseMove(event: MouseEvent) {
+    if (!this.isPanning) return;
+
+    const deltaX = event.clientX - this.panStartX;
+    const deltaY = event.clientY - this.panStartY;
+    
+    const viewBoxValues = this.viewBox().split(' ').map(Number);
+    const viewBoxWidth = viewBoxValues[2];
+    const viewBoxHeight = viewBoxValues[3];
+    
+    const svgElement = document.querySelector('.visualizer-svg') as SVGSVGElement;
+    if (!svgElement) return;
+    
+    const bbox = svgElement.getBoundingClientRect();
+    const ratioX = viewBoxWidth / bbox.width;
+    const ratioY = viewBoxHeight / bbox.height;
+    
+    const newX = this.viewBoxStartX - (deltaX * ratioX);
+    const newY = this.viewBoxStartY - (deltaY * ratioY);
+    
+    this.viewBox.set(`${newX} ${newY} ${viewBoxWidth} ${viewBoxHeight}`);
+  }
+
+  private onMouseUp() {
+    this.isPanning = false;
+  }
+
   private zoomToNode(nodeId: string) {
     const node = this.nodes.find(n => n.id === nodeId);
     if (!node) return;
 
-    // Zoom sur le node sélectionné
     const targetZoom = 2.5;
     const newWidth = this.baseViewBox.width / targetZoom;
     const newHeight = this.baseViewBox.height / targetZoom;
@@ -164,7 +210,6 @@ export class VisualizerComponent implements OnInit {
   }
 
   private onWheel(event: Event) {
-    // ✅ Caster l'event en WheelEvent
     const wheelEvent = event as WheelEvent;
     wheelEvent.preventDefault();
     
@@ -172,19 +217,23 @@ export class VisualizerComponent implements OnInit {
     const currentZoom = this.zoomLevel();
     
     if (delta < 0) {
-      // Zoom in
       const newZoom = Math.min(currentZoom * 1.1, this.maxZoom);
       this.applyZoom(newZoom);
     } else {
-      // Zoom out
       const newZoom = Math.max(currentZoom / 1.1, this.minZoom);
       this.applyZoom(newZoom);
     }
   }
 
   private applyZoom(newZoom: number) {
-    const centerX = this.baseViewBox.x + this.baseViewBox.width / 2;
-    const centerY = this.baseViewBox.y + this.baseViewBox.height / 2;
+    const viewBoxValues = this.viewBox().split(' ').map(Number);
+    const currentX = viewBoxValues[0];
+    const currentY = viewBoxValues[1];
+    const currentWidth = viewBoxValues[2];
+    const currentHeight = viewBoxValues[3];
+    
+    const centerX = currentX + currentWidth / 2;
+    const centerY = currentY + currentHeight / 2;
     
     const newWidth = this.baseViewBox.width / newZoom;
     const newHeight = this.baseViewBox.height / newZoom;

@@ -1,13 +1,11 @@
 <div class="device-details-container">
   @if (selectedDevice) {
     <div class="details-content">
-      <div class="details-header">
-        <span class="text-10">Device Details</span>
-      </div>
+      <!-- ✅ TITRE ENLEVÉ -->
 
       <div class="device-info-card">
         <div class="device-header">
-          <i class="{{ getOSIcon(selectedDevice.os) }} device-icon"></i>
+          <i class="fas {{ getOSIcon(selectedDevice.os) }} device-icon"></i>
           <div class="device-identity">
             <span class="device-name">{{ selectedDevice.name }}</span>
             @if (selectedDevice.ip) {
@@ -38,7 +36,6 @@
         </div>
       </div>
 
-      <!-- NOUVELLE SECTION : Links -->
       @if (getConnectedDevices().length > 0) {
         <div class="links-section">
           <span class="section-title">Links</span>

@@ -5,7 +5,9 @@ import { WindowState, WindowConfig, WindowId } from '../models/window.model';
   providedIn: 'root'
 })
 export class WindowManagerService {
-  private readonly GAP = 20; // Espacement entre fenêtres
+  private readonly GAP = 20;
+  private readonly HEADER_HEIGHT = 60;
+  private readonly MARGIN = 20;
 
   private windowConfigs: WindowConfig[] = [
     {
@@ -56,45 +58,30 @@ export class WindowManagerService {
 
   private createWindowState(config: WindowConfig, index: number): WindowState {
     const viewportWidth = typeof window !== 'undefined' ? window.innerWidth : 1920;
-    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight - 60 : 1020;
+    const viewportHeight = typeof window !== 'undefined' ? window.innerHeight - this.HEADER_HEIGHT : 1020;
 
     let position = { ...config.defaultPosition };
     let size = { ...config.defaultSize };
 
+    const availableHeight = viewportHeight - (this.MARGIN * 2);
+    const topRowHeight = Math.floor((availableHeight - this.GAP) / 2);
+    const bottomRowHeight = Math.floor((availableHeight - this.GAP) / 2);
+    const availableWidth = viewportWidth - (this.MARGIN * 2);
+
     if (config.id === 'devices') {
-      size = { 
-        width: viewportWidth - 40, 
-        height: (viewportHeight - this.GAP) / 2 - 30
-      };
-      position = { x: 20, y: 80 };
+      size = { width: availableWidth, height: topRowHeight };
+      position = { x: this.MARGIN, y: this.HEADER_HEIGHT + this.MARGIN };
     } else if (config.id === 'visualizer') {
-      size = { 
-        width: viewportWidth - 40, 
-        height: (viewportHeight - this.GAP) / 2 - 30
-      };
-      position = { x: 20, y: 80 + (viewportHeight - this.GAP) / 2 + this.GAP };
+      size = { width: availableWidth, height: bottomRowHeight };
+      position = { x: this.MARGIN, y: this.HEADER_HEIGHT + this.MARGIN + topRowHeight + this.GAP };
     } else if (config.id === 'details') {
-      const devicesWidth = viewportWidth - 40;
-      const detailsWidth = Math.floor(devicesWidth * 0.4);
-      size = { 
-        width: detailsWidth - this.GAP, 
-        height: (viewportHeight - this.GAP) / 2 - 30
-      };
-      position = { 
-        x: 20 + (devicesWidth - detailsWidth) + this.GAP, 
-        y: 80 
-      };
+      const detailsWidth = Math.floor(availableWidth * 0.4);
+      size = { width: detailsWidth - this.GAP, height: topRowHeight };
+      position = { x: this.MARGIN + (availableWidth - detailsWidth) + this.GAP, y: this.HEADER_HEIGHT + this.MARGIN };
     } else if (config.id === 'chatbot') {
-      const vizWidth = viewportWidth - 40;
-      const chatbotWidth = Math.floor(vizWidth * 0.3);
-      size = { 
-        width: chatbotWidth - this.GAP, 
-        height: (viewportHeight - this.GAP) / 2 - 30
-      };
-      position = { 
-        x: 20 + (vizWidth - chatbotWidth) + this.GAP, 
-        y: 80 + (viewportHeight - this.GAP) / 2 + this.GAP
-      };
+      const chatbotWidth = Math.floor(availableWidth * 0.3);
+      size = { width: chatbotWidth - this.GAP, height: bottomRowHeight };
+      position = { x: this.MARGIN + (availableWidth - chatbotWidth) + this.GAP, y: this.HEADER_HEIGHT + this.MARGIN + topRowHeight + this.GAP };
     }
 
     return {
@@ -118,6 +105,12 @@ export class WindowManagerService {
     
     if (index !== -1) {
       const currentWindow = windows[index];
+      
+      if (currentWindow.isOpen) {
+        this.focusWindow(windowId);
+        return;
+      }
+      
       const newWindows = [...windows];
 
       if (windowId === 'details') {
@@ -139,19 +132,8 @@ export class WindowManagerService {
             isMinimized: false,
             zIndex: this.maxZIndexSignal() + 1,
             data: data || currentWindow.data,
-            position: { 
-              x: devicesWindow.position.x + devicesNewWidth + this.GAP, 
-              y: devicesWindow.position.y 
-            },
+            position: { x: devicesWindow.position.x + devicesNewWidth + this.GAP, y: devicesWindow.position.y },
             size: { width: detailsWidth, height: devicesWindow.size.height }
-          };
-        } else {
-          newWindows[index] = {
-            ...currentWindow,
-            isOpen: true,
-            isMinimized: false,
-            zIndex: this.maxZIndexSignal() + 1,
-            data: data || currentWindow.data
           };
         }
       } else if (windowId === 'chatbot') {
@@ -173,19 +155,8 @@ export class WindowManagerService {
             isMinimized: false,
             zIndex: this.maxZIndexSignal() + 1,
             data: data || currentWindow.data,
-            position: { 
-              x: vizWindow.position.x + vizNewWidth + this.GAP, 
-              y: vizWindow.position.y 
-            },
+            position: { x: vizWindow.position.x + vizNewWidth + this.GAP, y: vizWindow.position.y },
             size: { width: chatbotWidth, height: vizWindow.size.height }
-          };
-        } else {
-          newWindows[index] = {
-            ...currentWindow,
-            isOpen: true,
-            isMinimized: false,
-            zIndex: this.maxZIndexSignal() + 1,
-            data: data || currentWindow.data
           };
         }
       } else {
@@ -266,19 +237,23 @@ export class WindowManagerService {
       if (window.isMaximized) {
         const config = this.windowConfigs.find(c => c.id === windowId);
         if (config) {
+          const restored = this.createWindowState(config, index);
           newWindows[index] = {
             ...window,
             isMaximized: false,
-            position: { ...config.defaultPosition },
-            size: { ...config.defaultSize }
+            position: restored.position,
+            size: restored.size
           };
         }
       } else {
         newWindows[index] = {
           ...window,
           isMaximized: true,
-          position: { x: 0, y: 60 },
-          size: { width: window.size.width, height: window.size.height }
+          position: { x: 0, y: this.HEADER_HEIGHT },
+          size: { 
+            width: typeof globalThis.window !== 'undefined' ? globalThis.window.innerWidth : 1920, 
+            height: (typeof globalThis.window !== 'undefined' ? globalThis.window.innerHeight : 1080) - this.HEADER_HEIGHT
+          }
         };
       }
       
@@ -320,12 +295,249 @@ export class WindowManagerService {
       const newWindows = [...windows];
       const window = newWindows[index];
       
-      const finalSize = {
+      let finalSize = {
         width: Math.max(size.width, window.minSize.width),
         height: Math.max(size.height, window.minSize.height)
       };
-      
+
       newWindows[index] = { ...window, size: finalSize };
+
+      // ✅ DEVICES : affecte details (horizontal) ET visualizer (vertical)
+      if (windowId === 'devices') {
+        const detailsWindow = windows.find(w => w.id === 'details');
+        const vizWindow = windows.find(w => w.id === 'visualizer');
+        
+        // Horizontal : devices ↔ details
+        if (detailsWindow && detailsWindow.isOpen) {
+          const detailsIndex = windows.findIndex(w => w.id === 'details');
+          const totalWidth = window.size.width + detailsWindow.size.width + this.GAP;
+          const newDetailsWidth = Math.max(totalWidth - finalSize.width - this.GAP, detailsWindow.minSize.width);
+          
+          // ✅ LIMITE : Ne pas dépasser le bord droit
+          const maxTotalWidth = (typeof globalThis.window !== 'undefined' ? globalThis.window.innerWidth : 1920) - (this.MARGIN * 2);
+          if (finalSize.width + newDetailsWidth + this.GAP > maxTotalWidth) {
+            finalSize.width = maxTotalWidth - newDetailsWidth - this.GAP;
+          }
+          
+          newWindows[detailsIndex] = {
+            ...detailsWindow,
+            size: { ...detailsWindow.size, width: newDetailsWidth },
+            position: { x: window.position.x + finalSize.width + this.GAP, y: detailsWindow.position.y }
+          };
+          
+          newWindows[index].size = finalSize;
+        }
+        
+        // Vertical : devices ↔ visualizer
+        if (vizWindow && vizWindow.isOpen) {
+          const vizIndex = windows.findIndex(w => w.id === 'visualizer');
+          const totalHeight = window.size.height + vizWindow.size.height + this.GAP;
+          const newVizHeight = Math.max(totalHeight - finalSize.height - this.GAP, vizWindow.minSize.height);
+          
+          // ✅ LIMITE : Ne pas dépasser le bas
+          const maxTotalHeight = (typeof globalThis.window !== 'undefined' ? globalThis.window.innerHeight : 1080) - this.HEADER_HEIGHT - (this.MARGIN * 2);
+          if (finalSize.height + newVizHeight + this.GAP > maxTotalHeight) {
+            finalSize.height = maxTotalHeight - newVizHeight - this.GAP;
+          }
+          
+          newWindows[vizIndex] = {
+            ...vizWindow,
+            size: { ...vizWindow.size, height: newVizHeight },
+            position: { x: vizWindow.position.x, y: window.position.y + finalSize.height + this.GAP }
+          };
+          
+          newWindows[index].size = finalSize;
+          
+          // ✅ PROPAGATION : Si chatbot est ouvert, ajuster sa hauteur aussi
+          const chatbotWindow = windows.find(w => w.id === 'chatbot');
+          if (chatbotWindow && chatbotWindow.isOpen) {
+            const chatbotIndex = windows.findIndex(w => w.id === 'chatbot');
+            newWindows[chatbotIndex] = {
+              ...chatbotWindow,
+              size: { ...chatbotWindow.size, height: newVizHeight },
+              position: { x: chatbotWindow.position.x, y: window.position.y + finalSize.height + this.GAP }
+            };
+          }
+        }
+      } 
+      
+      // ✅ DETAILS : affecte devices (horizontal) ET chatbot (vertical)
+      else if (windowId === 'details') {
+        const devicesWindow = windows.find(w => w.id === 'devices');
+        const chatbotWindow = windows.find(w => w.id === 'chatbot');
+        
+        // Horizontal : details ↔ devices
+        if (devicesWindow && devicesWindow.isOpen) {
+          const devicesIndex = windows.findIndex(w => w.id === 'devices');
+          const totalWidth = devicesWindow.size.width + window.size.width + this.GAP;
+          const newDevicesWidth = Math.max(totalWidth - finalSize.width - this.GAP, devicesWindow.minSize.width);
+          
+          const maxTotalWidth = (typeof globalThis.window !== 'undefined' ? globalThis.window.innerWidth : 1920) - (this.MARGIN * 2);
+          if (newDevicesWidth + finalSize.width + this.GAP > maxTotalWidth) {
+            finalSize.width = maxTotalWidth - newDevicesWidth - this.GAP;
+          }
+          
+          newWindows[devicesIndex] = {
+            ...devicesWindow,
+            size: { ...devicesWindow.size, width: newDevicesWidth }
+          };
+          newWindows[index].position = { 
+            x: devicesWindow.position.x + newDevicesWidth + this.GAP, 
+            y: window.position.y 
+          };
+          newWindows[index].size = finalSize;
+        }
+        
+        // Vertical : details ↔ chatbot
+        if (chatbotWindow && chatbotWindow.isOpen) {
+          const chatbotIndex = windows.findIndex(w => w.id === 'chatbot');
+          const totalHeight = window.size.height + chatbotWindow.size.height + this.GAP;
+          const newChatbotHeight = Math.max(totalHeight - finalSize.height - this.GAP, chatbotWindow.minSize.height);
+          
+          const maxTotalHeight = (typeof globalThis.window !== 'undefined' ? globalThis.window.innerHeight : 1080) - this.HEADER_HEIGHT - (this.MARGIN * 2);
+          if (finalSize.height + newChatbotHeight + this.GAP > maxTotalHeight) {
+            finalSize.height = maxTotalHeight - newChatbotHeight - this.GAP;
+          }
+          
+          newWindows[chatbotIndex] = {
+            ...chatbotWindow,
+            size: { ...chatbotWindow.size, height: newChatbotHeight },
+            position: { x: chatbotWindow.position.x, y: window.position.y + finalSize.height + this.GAP }
+          };
+          
+          newWindows[index].size = finalSize;
+          
+          // ✅ PROPAGATION : Si visualizer est ouvert, ajuster sa hauteur aussi
+          const vizWindow = windows.find(w => w.id === 'visualizer');
+          if (vizWindow && vizWindow.isOpen) {
+            const vizIndex = windows.findIndex(w => w.id === 'visualizer');
+            newWindows[vizIndex] = {
+              ...vizWindow,
+              size: { ...vizWindow.size, height: newChatbotHeight },
+              position: { x: vizWindow.position.x, y: window.position.y + finalSize.height + this.GAP }
+            };
+          }
+        }
+      } 
+      
+      // ✅ VISUALIZER : affecte chatbot (horizontal) ET devices (vertical)
+      else if (windowId === 'visualizer') {
+        const chatbotWindow = windows.find(w => w.id === 'chatbot');
+        const devicesWindow = windows.find(w => w.id === 'devices');
+        
+        // Horizontal : visualizer ↔ chatbot
+        if (chatbotWindow && chatbotWindow.isOpen) {
+          const chatbotIndex = windows.findIndex(w => w.id === 'chatbot');
+          const totalWidth = window.size.width + chatbotWindow.size.width + this.GAP;
+          const newChatbotWidth = Math.max(totalWidth - finalSize.width - this.GAP, chatbotWindow.minSize.width);
+          
+          const maxTotalWidth = (typeof globalThis.window !== 'undefined' ? globalThis.window.innerWidth : 1920) - (this.MARGIN * 2);
+          if (finalSize.width + newChatbotWidth + this.GAP > maxTotalWidth) {
+            finalSize.width = maxTotalWidth - newChatbotWidth - this.GAP;
+          }
+          
+          newWindows[chatbotIndex] = {
+            ...chatbotWindow,
+            size: { ...chatbotWindow.size, width: newChatbotWidth },
+            position: { x: window.position.x + finalSize.width + this.GAP, y: chatbotWindow.position.y }
+          };
+          
+          newWindows[index].size = finalSize;
+        }
+        
+        // Vertical : visualizer ↔ devices
+        if (devicesWindow && devicesWindow.isOpen) {
+          const devicesIndex = windows.findIndex(w => w.id === 'devices');
+          const totalHeight = devicesWindow.size.height + window.size.height + this.GAP;
+          const newDevicesHeight = Math.max(totalHeight - finalSize.height - this.GAP, devicesWindow.minSize.height);
+          
+          const maxTotalHeight = (typeof globalThis.window !== 'undefined' ? globalThis.window.innerHeight : 1080) - this.HEADER_HEIGHT - (this.MARGIN * 2);
+          if (newDevicesHeight + finalSize.height + this.GAP > maxTotalHeight) {
+            finalSize.height = maxTotalHeight - newDevicesHeight - this.GAP;
+          }
+          
+          newWindows[devicesIndex] = {
+            ...devicesWindow,
+            size: { ...devicesWindow.size, height: newDevicesHeight }
+          };
+          newWindows[index].position = { 
+            x: window.position.x, 
+            y: devicesWindow.position.y + newDevicesHeight + this.GAP 
+          };
+          newWindows[index].size = finalSize;
+          
+          // ✅ PROPAGATION : Si details est ouvert, ajuster sa hauteur aussi
+          const detailsWindow = windows.find(w => w.id === 'details');
+          if (detailsWindow && detailsWindow.isOpen) {
+            const detailsIndex = windows.findIndex(w => w.id === 'details');
+            newWindows[detailsIndex] = {
+              ...detailsWindow,
+              size: { ...detailsWindow.size, height: newDevicesHeight }
+            };
+          }
+        }
+      } 
+      
+      // ✅ CHATBOT : affecte visualizer (horizontal) ET details (vertical)
+      else if (windowId === 'chatbot') {
+        const vizWindow = windows.find(w => w.id === 'visualizer');
+        const detailsWindow = windows.find(w => w.id === 'details');
+        
+        // Horizontal : chatbot ↔ visualizer
+        if (vizWindow && vizWindow.isOpen) {
+          const vizIndex = windows.findIndex(w => w.id === 'visualizer');
+          const totalWidth = vizWindow.size.width + window.size.width + this.GAP;
+          const newVizWidth = Math.max(totalWidth - finalSize.width - this.GAP, vizWindow.minSize.width);
+          
+          const maxTotalWidth = (typeof globalThis.window !== 'undefined' ? globalThis.window.innerWidth : 1920) - (this.MARGIN * 2);
+          if (newVizWidth + finalSize.width + this.GAP > maxTotalWidth) {
+            finalSize.width = maxTotalWidth - newVizWidth - this.GAP;
+          }
+          
+          newWindows[vizIndex] = {
+            ...vizWindow,
+            size: { ...vizWindow.size, width: newVizWidth }
+          };
+          newWindows[index].position = { 
+            x: vizWindow.position.x + newVizWidth + this.GAP, 
+            y: window.position.y 
+          };
+          newWindows[index].size = finalSize;
+        }
+        
+        // Vertical : chatbot ↔ details
+        if (detailsWindow && detailsWindow.isOpen) {
+          const detailsIndex = windows.findIndex(w => w.id === 'details');
+          const totalHeight = detailsWindow.size.height + window.size.height + this.GAP;
+          const newDetailsHeight = Math.max(totalHeight - finalSize.height - this.GAP, detailsWindow.minSize.height);
+          
+          const maxTotalHeight = (typeof globalThis.window !== 'undefined' ? globalThis.window.innerHeight : 1080) - this.HEADER_HEIGHT - (this.MARGIN * 2);
+          if (newDetailsHeight + finalSize.height + this.GAP > maxTotalHeight) {
+            finalSize.height = maxTotalHeight - newDetailsHeight - this.GAP;
+          }
+          
+          newWindows[detailsIndex] = {
+            ...detailsWindow,
+            size: { ...detailsWindow.size, height: newDetailsHeight }
+          };
+          newWindows[index].position = { 
+            x: window.position.x, 
+            y: detailsWindow.position.y + newDetailsHeight + this.GAP 
+          };
+          newWindows[index].size = finalSize;
+          
+          // ✅ PROPAGATION : Si devices est ouvert, ajuster sa hauteur aussi
+          const devicesWindow = windows.find(w => w.id === 'devices');
+          if (devicesWindow && devicesWindow.isOpen) {
+            const devicesIndex = windows.findIndex(w => w.id === 'devices');
+            newWindows[devicesIndex] = {
+              ...devicesWindow,
+              size: { ...devicesWindow.size, height: newDetailsHeight }
+            };
+          }
+        }
+      }
+      
       this.windowsSignal.set(newWindows);
     }
   }

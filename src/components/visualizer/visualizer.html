@@ -1,6 +1,5 @@
 <div class="visualizer-container">
   <svg class="visualizer-svg" [attr.viewBox]="viewBox()" preserveAspectRatio="xMidYMid meet">
-    <!-- Edges -->
     <g class="edges">
       @for (edge of edges; track edge.from + edge.to) {
         <line
@@ -13,13 +12,12 @@
       }
     </g>
 
-    <!-- Nodes -->
     <g class="nodes">
       @for (node of nodes; track node.id) {
         <g 
           [attr.class]="getNodeClass(node.device)"
           [attr.transform]="'translate(' + node.x + ',' + node.y + ')'"
-          (click)="onNodeClick(node.id)"
+          (click)="onNodeClick(node.id, $event)"
         >
           <circle r="30" class="node-circle" />
           <text class="node-label" text-anchor="middle" dy=".3em">
@@ -30,7 +28,6 @@
     </g>
   </svg>
 
-  <!-- Boutons de contrôle du zoom -->
   <div class="zoom-controls">
     <button class="zoom-btn" (click)="zoomIn()" title="Zoom In">
       <i class="fas fa-plus"></i>

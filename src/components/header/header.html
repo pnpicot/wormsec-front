@@ -1,7 +1,8 @@
 <header class="app-header">
   <div class="header-left">
     <div class="logo">
-      <i class="fas fa-shield-virus"></i>
+      <!-- ✅ Logo PNG -->
+      <img src="logo_wormsec.png" alt="WormSec" class="logo-image">
       <span class="logo-text">WORMSEC ANTIVIRUS</span>
     </div>
   </div>
@@ -14,8 +15,81 @@
     <button class="header-btn" (click)="onChatbotClick()" title="Open Chatbot">
       <i class="fas fa-comment-dots"></i>
     </button>
-    <button class="header-btn" (click)="onSettingsClick()" title="Settings">
-      <i class="fas fa-cog"></i>
-    </button>
+    
+    <div class="settings-dropdown-container">
+      <button 
+        class="header-btn" 
+        (click)="toggleSettingsDropdown($event)" 
+        [class.active]="isSettingsOpen()"
+        title="Settings"
+      >
+        <i class="fas fa-cog"></i>
+      </button>
+
+      @if (isSettingsOpen()) {
+        <div class="settings-dropdown">
+          <div class="dropdown-section">
+            <span class="dropdown-section-title">Windows</span>
+            <ul class="window-list">
+              <li 
+                class="window-item"
+                [class.open]="isWindowOpen('devices')"
+                (click)="toggleWindow('devices', $event)"
+              >
+                <i class="fas fa-desktop"></i>
+                <span>{{ getWindowTitle('devices') }}</span>
+                @if (isWindowOpen('devices')) {
+                  <i class="fas fa-check status-icon"></i>
+                }
+              </li>
+              <li 
+                class="window-item"
+                [class.open]="isWindowOpen('details')"
+                (click)="toggleWindow('details', $event)"
+              >
+                <i class="fas fa-info-circle"></i>
+                <span>{{ getWindowTitle('details') }}</span>
+                @if (isWindowOpen('details')) {
+                  <i class="fas fa-check status-icon"></i>
+                }
+              </li>
+              <li 
+                class="window-item"
+                [class.open]="isWindowOpen('visualizer')"
+                (click)="toggleWindow('visualizer', $event)"
+              >
+                <i class="fas fa-project-diagram"></i>
+                <span>{{ getWindowTitle('visualizer') }}</span>
+                @if (isWindowOpen('visualizer')) {
+                  <i class="fas fa-check status-icon"></i>
+                }
+              </li>
+              <li 
+                class="window-item"
+                [class.open]="isWindowOpen('chatbot')"
+                (click)="toggleWindow('chatbot', $event)"
+              >
+                <i class="fas fa-comment-dots"></i>
+                <span>{{ getWindowTitle('chatbot') }}</span>
+                @if (isWindowOpen('chatbot')) {
+                  <i class="fas fa-check status-icon"></i>
+                }
+              </li>
+            </ul>
+          </div>
+
+          <div class="dropdown-section actions-section">
+            <button class="dropdown-action-btn" (click)="onSettingsButtonClick($event)">
+              <i class="fas fa-cog"></i>
+              <span>Settings</span>
+            </button>
+            <button class="dropdown-action-btn" (click)="onInfoButtonClick($event)">
+              <i class="fas fa-circle-info"></i>
+              <span>Info</span>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
   </div>
 </header>

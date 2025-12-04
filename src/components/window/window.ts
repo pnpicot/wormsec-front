@@ -78,9 +78,8 @@ export class WindowComponent implements AfterViewInit {
       const deltaX = event.clientX - this.dragStartX;
       const deltaY = event.clientY - this.dragStartY;
 
-      // ✅ Limiter la position pour ne pas sortir de l'écran
-      const maxX = window.innerWidth - 200; // Minimum 200px visible
-      const maxY = window.innerHeight - 100; // Minimum 100px visible
+      const maxX = window.innerWidth - 200;
+      const maxY = window.innerHeight - 100;
 
       this.positionChange.emit({
         x: Math.max(0, Math.min(maxX, this.dragStartWindowX + deltaX)),
@@ -95,22 +94,27 @@ export class WindowComponent implements AfterViewInit {
       let newX = this.dragStartWindowX;
       let newY = this.dragStartWindowY;
 
-      // ✅ Calculer les nouvelles dimensions avec limites
-      const maxWidth = window.innerWidth - this.dragStartWindowX - 20; // 20px de marge
-      const maxHeight = window.innerHeight - this.dragStartWindowY - 20;
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const maxWidth = viewportWidth - this.dragStartWindowX;
+      const maxHeight = viewportHeight - this.dragStartWindowY;
 
       if (this.resizeDirection.includes('e')) {
+        const potentialWidth = this.resizeStartWidth + deltaX;
         newWidth = Math.max(
           this.window.minSize.width, 
-          Math.min(maxWidth, this.resizeStartWidth + deltaX)
+          Math.min(maxWidth, potentialWidth)
         );
       }
+      
       if (this.resizeDirection.includes('s')) {
+        const potentialHeight = this.resizeStartHeight + deltaY;
         newHeight = Math.max(
           this.window.minSize.height, 
-          Math.min(maxHeight, this.resizeStartHeight + deltaY)
+          Math.min(maxHeight, potentialHeight)
         );
       }
+      
       if (this.resizeDirection.includes('w')) {
         const potentialWidth = this.resizeStartWidth - deltaX;
         if (potentialWidth >= this.window.minSize.width) {
@@ -118,6 +122,7 @@ export class WindowComponent implements AfterViewInit {
           newX = Math.max(0, this.dragStartWindowX + deltaX);
         }
       }
+      
       if (this.resizeDirection.includes('n')) {
         const potentialHeight = this.resizeStartHeight - deltaY;
         if (potentialHeight >= this.window.minSize.height) {

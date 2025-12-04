@@ -1,4 +1,4 @@
-import { Component, effect, signal, ChangeDetectorRef, untracked } from '@angular/core';
+import { Component, effect, signal, ChangeDetectorRef, untracked, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StatusIndicator } from '../../../components/status-indicator/status-indicator';
 import { DeviceService } from '../../../services/device.service';
@@ -15,6 +15,7 @@ import { Device, DeviceStatus, DeviceRisk } from '../../../models/device.model';
 export class DeviceList {
   selectedDeviceId: string | null = null;
   isFilterOpen = signal(false);
+  dropdownPosition = signal({ top: 0, left: 0 });
   
   filters = signal({
     status: [] as DeviceStatus[],
@@ -27,13 +28,22 @@ export class DeviceList {
     private windowManager: WindowManagerService,
     private cdr: ChangeDetectorRef
   ) {
-    // ✅ Utiliser untracked pour éviter les dépendances circulaires
     effect(() => {
       const selected = this.deviceService.selectedDevice();
       untracked(() => {
         this.selectedDeviceId = selected?.id || null;
       });
     });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const filterContainer = target.closest('.filter-dropdown-container');
+    
+    if (!filterContainer && this.isFilterOpen()) {
+      this.isFilterOpen.set(false);
+    }
   }
 
   get devices() {
@@ -57,8 +67,39 @@ export class DeviceList {
     });
   }
 
-  toggleFilterDropdown() {
+  toggleFilterDropdown(event: MouseEvent) {
+    event.stopPropagation();
     this.isFilterOpen.update(v => !v);
+    
+    if (this.isFilterOpen()) {
+      setTimeout(() => {
+        const button = event.target as HTMLElement;
+        const filterBtn = button.closest('.btn-filter') as HTMLElement;
+        
+        if (filterBtn) {
+          const rect = filterBtn.getBoundingClientRect();
+          const dropdownWidth = 280;
+          const dropdownMaxHeight = 500;
+          
+          // ✅ Position : aligner le coin supérieur droit du dropdown avec le bouton
+          let top = rect.top;
+          let left = rect.right - dropdownWidth;
+          
+          // Vérifier si ça dépasse en bas
+          const viewportHeight = window.innerHeight;
+          if (top + dropdownMaxHeight > viewportHeight) {
+            top = Math.max(60, viewportHeight - dropdownMaxHeight - 20);
+          }
+          
+          // Vérifier si ça dépasse à gauche
+          if (left < 20) {
+            left = 20;
+          }
+          
+          this.dropdownPosition.set({ top, left });
+        }
+      }, 0);
+    }
   }
 
   toggleStatusFilter(status: DeviceStatus) {
@@ -120,7 +161,11 @@ export class DeviceList {
 
   onDeviceClick(device: Device) {
     this.deviceService.selectDevice(device.id);
-    this.windowManager.openWindow('details');
+    
+    const detailsWindow = this.windowManager.getWindow('details');
+    if (!detailsWindow?.isOpen) {
+      this.windowManager.openWindow('details');
+    }
   }
 
   isSelected(device: Device): boolean {
